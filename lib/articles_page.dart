@@ -7,7 +7,7 @@ class ArticlesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final articles = ArticlesContainer.of(context).articles;
+    final articles = ArticlesProvider.watch(context).value;
 
     return Scaffold(
       appBar: AppBar(

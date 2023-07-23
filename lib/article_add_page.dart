@@ -26,7 +26,7 @@ class _ArticleAddPageState extends State<ArticleAddPage> {
             ElevatedButton(
               onPressed: () {
                 Navigator.pop(context);
-                ArticlesProviderState.of(context).add(Article(
+                ArticlesProvider.read(context).add(Article(
                   _controller.text,
                   'chooyan',
                 ));
