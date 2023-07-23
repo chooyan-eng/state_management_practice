@@ -9,52 +9,57 @@ class ArticlesProvider extends StatefulWidget {
 
   final Widget child;
 
+  static ArticlesState watch(BuildContext context) {
+    final widget =
+        context.dependOnInheritedWidgetOfExactType<ArticlesContainer>();
+    assert(widget != null, 'No ArticlesContainer found');
+    return widget!.state;
+  }
+
+  static ArticlesState read(BuildContext context) {
+    final widget = context.getInheritedWidgetOfExactType<ArticlesContainer>();
+    assert(widget != null, 'No ArticlesContainer found');
+    return widget!.state;
+  }
+
   @override
   State<ArticlesProvider> createState() => ArticlesProviderState();
 }
 
 class ArticlesProviderState extends State<ArticlesProvider> {
-  final articles = <Article>[];
-
-  static ArticlesProviderState of(BuildContext context) {
-    final state = context.findAncestorStateOfType<ArticlesProviderState>();
-    assert(state != null, 'No ArticlesProviderState found');
-    return state!;
-  }
-
-  void add(Article newArticle) {
-    setState(() {
-      articles.add(newArticle);
-    });
-  }
+  final state = ArticlesState();
 
   @override
   Widget build(BuildContext context) {
-    return ArticlesContainer(
-      articles,
-      child: widget.child,
+    return ListenableBuilder(
+      listenable: state,
+      builder: (context, child) => ArticlesContainer(
+        state,
+        child: widget.child,
+      ),
     );
   }
 }
 
 class ArticlesContainer extends InheritedWidget {
   const ArticlesContainer(
-    this.articles, {
+    this.state, {
     super.key,
     required super.child,
   });
 
-  static ArticlesContainer of(BuildContext context) {
-    final widget =
-        context.dependOnInheritedWidgetOfExactType<ArticlesContainer>();
-    assert(widget != null, 'No ArticlesContainer found');
-    return widget!;
-  }
-
-  final List<Article> articles;
+  final ArticlesState state;
 
   @override
   bool updateShouldNotify(covariant ArticlesContainer oldWidget) {
     return true;
+  }
+}
+
+class ArticlesState extends ValueNotifier<List<Article>> {
+  ArticlesState() : super([]);
+
+  void add(Article newArticle) {
+    value = [...value, newArticle];
   }
 }
