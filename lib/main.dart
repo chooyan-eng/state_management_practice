@@ -11,8 +11,9 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const ArticlesProvider(
-      child: MaterialApp(
+    return Provider(
+      create: () => ArticlesState(),
+      child: const MaterialApp(
         home: ArticlesPage(),
       ),
     );

@@ -1,57 +1,65 @@
 import 'package:flutter/material.dart';
 import 'package:state_management_practice/article.dart';
 
-class ArticlesProvider extends StatefulWidget {
-  const ArticlesProvider({
+class Provider<T extends ValueNotifier> extends StatefulWidget {
+  const Provider({
     super.key,
+    required this.create,
     required this.child,
   });
 
+  final T Function() create;
   final Widget child;
 
-  static ArticlesState watch(BuildContext context) {
+  static T watch<T>(BuildContext context) {
     final widget =
-        context.dependOnInheritedWidgetOfExactType<ArticlesContainer>();
+        context.dependOnInheritedWidgetOfExactType<StateContainer<T>>();
     assert(widget != null, 'No ArticlesContainer found');
     return widget!.state;
   }
 
-  static ArticlesState read(BuildContext context) {
-    final widget = context.getInheritedWidgetOfExactType<ArticlesContainer>();
+  static T read<T>(BuildContext context) {
+    final widget = context.getInheritedWidgetOfExactType<StateContainer<T>>();
     assert(widget != null, 'No ArticlesContainer found');
     return widget!.state;
   }
 
   @override
-  State<ArticlesProvider> createState() => ArticlesProviderState();
+  State<Provider> createState() => ProviderState<T>();
 }
 
-class ArticlesProviderState extends State<ArticlesProvider> {
-  final state = ArticlesState();
+class ProviderState<T extends ValueNotifier> extends State<Provider> {
+  late final ValueNotifier state;
+
+  @override
+  void initState() {
+    super.initState();
+    state = widget.create();
+  }
 
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
       listenable: state,
-      builder: (context, child) => ArticlesContainer(
-        state,
+      builder: (context, child) => StateContainer<T>(
+        state as T,
         child: widget.child,
       ),
     );
   }
 }
 
-class ArticlesContainer extends InheritedWidget {
-  const ArticlesContainer(
+class StateContainer<T> extends InheritedWidget {
+  const StateContainer(
     this.state, {
     super.key,
     required super.child,
   });
 
-  final ArticlesState state;
+  final T state;
 
   @override
-  bool updateShouldNotify(covariant ArticlesContainer oldWidget) {
+  bool updateShouldNotify(covariant StateContainer oldWidget) {
     return true;
   }
 }
